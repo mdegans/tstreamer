@@ -1,0 +1,32 @@
+[package]
+name = "tstreamer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+misanthropic = { git = "https://github.com/mdegans/misanthropic.git", branch = "dev", optional = true, features = [
+    "cot",
+    "html",
+    "image",
+    "jpeg",
+    "markdown",
+    "png",
+    "prompt-caching",
+] }
+image = { version = "0.25", optional = true, features = ["jpeg", "png"] }
+static_assertions = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+tokio = { version = "1", features = ["full"] }
+async-trait = "0.1"
+derive_more = { version = "1", features = ["from"] }
+pulldown-cmark = "0.12"
+pulldown-cmark-to-cmark = { version = "17" }
+xml-rs = "0.8"
+
+
+[features]
+default = ["misanthropic", "image"]
+misanthropic = ["dep:misanthropic"]
+image = ["dep:image"]
