@@ -1,18 +1,31 @@
-use super::{message::Content, Buffer, Error};
+use std::borrow::Cow;
 
-/// `ToolCall` [`Block`] of a [`Content`].
-pub trait ToolCall: Buffer {
+use crate::buffer::any;
+use crate::info::Info;
+
+use super::{
+    message::{Content, Role},
+    Buffer, Error, Message,
+};
+
+/// `ToolUse` [`Block`] of a [`Content`].
+pub trait Use: Buffer {
     /// ID of the tool call.
     fn id(&self) -> &str;
     /// The arguments for the tool.
     fn args(&self) -> &serde_json::Value;
 }
-static_assertions::assert_impl_all!(dyn ToolCall: Buffer);
-static_assertions::assert_obj_safe!(ToolCall);
+static_assertions::assert_impl_all!(dyn Use: Buffer);
+static_assertions::assert_obj_safe!(Use);
 
 /// `Return` is a value returned by a [`ToolCall`]. It may be successful or an
 /// error.
-pub trait Return: Buffer {
+pub trait Result: Message {
+    /// Role of the message.
+    fn role(&self) -> Role {
+        Role::ToolResult
+    }
+
     /// ID of the tool call.
     fn id(&self) -> &str;
 
@@ -27,23 +40,26 @@ pub trait Return: Buffer {
     /// Whether the return is an error.
     fn is_error(&self) -> bool;
 }
-static_assertions::assert_impl_all!(dyn Return: Buffer);
-static_assertions::assert_obj_safe!(Return);
+static_assertions::assert_impl_all!(dyn Result: Buffer);
+static_assertions::assert_obj_safe!(Result);
 
-pub trait ToolOk: Return {}
+/// `ToolOk` is a successful [`Result`].
+pub trait ToolOk: Result {}
+static_assertions::assert_impl_all!(dyn ToolOk: Buffer);
+static_assertions::assert_obj_safe!(ToolOk);
 
-/// `ToolError` is a result of a failed [`ToolCall`].
-pub trait ToolError: Return {
+/// `ToolError` is a result of a failed [`ToolCall`]. Intended for the
+/// [`Agent`].
+// This is not a buffer error because that is handled by the pipeline and this
+// is intended for the Agent to handle.
+pub trait ToolError: Result {
     /// The error message.
     fn message(&self) -> &str;
 }
-static_assertions::assert_impl_all!(dyn ToolError: Buffer);
 
-impl std::fmt::Display for Box<dyn ToolError> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.message().fmt(f)
-    }
-}
+static_assertions::assert_impl_all!(dyn ToolError: Buffer);
+static_assertions::assert_obj_safe!(ToolError);
+
 impl std::fmt::Debug for Box<dyn ToolError> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct(stringify!(ToolError))
@@ -54,3 +70,38 @@ impl std::fmt::Debug for Box<dyn ToolError> {
 }
 impl std::error::Error for Box<dyn ToolError> {}
 impl Error for Box<dyn ToolError> {}
+
+/// `ToolSchema` provides the schema for a [`Tool`]. [`Schema`] is already
+/// implemented for [`serde_json::Value`].
+pub trait Schema: Buffer {
+    /// The schema for the tool.
+    fn schema(&self) -> &dyn serde::Serialize;
+}
+static_assertions::assert_impl_all!(dyn Schema: Buffer);
+static_assertions::assert_obj_safe!(Schema);
+
+impl Buffer for serde_json::Value {
+    fn as_borrowed<'a>(&'a self) -> any::Borrowed<'a> {
+        any::Borrowed::Schema(self)
+    }
+
+    fn into_owned(self: Box<Self>) -> any::Owned {
+        any::Owned::Schema(self)
+    }
+}
+
+impl Info for serde_json::Value {
+    fn name(&self) -> Cow<'static, str> {
+        Cow::Borrowed("serde_json::Value")
+    }
+
+    fn description(&self) -> Cow<'static, str> {
+        Cow::Borrowed("A JSON value.")
+    }
+}
+
+impl Schema for serde_json::Value {
+    fn schema(&self) -> &dyn serde::Serialize {
+        self
+    }
+}

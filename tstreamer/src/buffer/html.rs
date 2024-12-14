@@ -3,7 +3,6 @@ use std::ops::Deref;
 use pulldown_cmark::html::push_html;
 
 use super::markdown::ToMarkdown;
-
 pub use super::markdown::{Options, DEFAULT_OPTIONS, VERBOSE_OPTIONS};
 
 /// Immutable wrapper around a [`String`]. Guaranteed to be valid HTML.
@@ -151,7 +150,7 @@ pub trait ToHtml: ToMarkdown {
 impl<T> ToHtml for T where T: ToMarkdown {}
 
 #[cfg(all(test, feature = "misanthropic"))]
-mod tests {
+mod misanthropic_tests {
     use super::*;
     use std::borrow::Borrow;
 

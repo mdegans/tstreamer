@@ -22,8 +22,11 @@ tokio = { version = "1", features = ["full"] }
 async-trait = "0.1"
 derive_more = { version = "1", features = ["from"] }
 pulldown-cmark = "0.12"
-pulldown-cmark-to-cmark = { version = "17" }
+pulldown-cmark-to-cmark = { version = "19" }
 xml-rs = "0.8"
+futures = "0.3"
+num_cpus = "1"
+petgraph = { version = "0.6", features = ["serde-1"] }
 
 
 [features]

@@ -123,7 +123,7 @@ impl From<pulldown_cmark::Options> for Options {
 /// be [`Display`]ed or dereferenced as a [`str`].
 ///
 /// [`Display`]: std::fmt::Display
-#[derive(derive_more::Display)]
+#[derive(derive_more::Display, Clone, Serialize, Deserialize)]
 #[cfg_attr(test, derive(PartialEq))]
 #[display("{text}")]
 pub struct Markdown {
@@ -243,6 +243,23 @@ pub trait ToMarkdown {
 }
 
 static_assertions::assert_obj_safe!(ToMarkdown);
+
+// This will also implement `ToHtml` for all misanthropic types.
+#[cfg(feature = "misanthropic")]
+impl<T> ToMarkdown for T
+where
+    T: ::misanthropic::markdown::ToMarkdown,
+{
+    fn markdown_events_custom<'a>(
+        &'a self,
+        options: Options,
+    ) -> Box<dyn Iterator<Item = pulldown_cmark::Event<'a>> + 'a> {
+        ::misanthropic::markdown::ToMarkdown::markdown_events_custom(
+            self,
+            options.into(),
+        )
+    }
+}
 
 impl Default for Options {
     fn default() -> Self {

@@ -6,12 +6,12 @@ use super::*;
 // Prompt
 
 impl Buffer for ::misanthropic::prompt::Prompt<'static> {
-    fn as_borrowed<'a>(&'a self) -> cow::Borrowed<'a> {
-        cow::Borrowed::Prompt(self)
+    fn as_borrowed<'a>(&'a self) -> any::Borrowed<'a> {
+        any::Borrowed::Prompt(self)
     }
 
-    fn into_owned(self: Box<Self>) -> cow::Owned {
-        cow::Owned::Prompt(self)
+    fn into_owned(self: Box<Self>) -> any::Owned {
+        any::Owned::Prompt(self)
     }
 }
 
@@ -28,12 +28,12 @@ impl Info for ::misanthropic::prompt::Prompt<'static> {
 // Message
 
 impl Buffer for ::misanthropic::prompt::Message<'static> {
-    fn as_borrowed<'a>(&'a self) -> cow::Borrowed<'a> {
-        cow::Borrowed::Message(self)
+    fn as_borrowed<'a>(&'a self) -> any::Borrowed<'a> {
+        any::Borrowed::Message(self)
     }
 
-    fn into_owned(self: Box<Self>) -> cow::Owned {
-        cow::Owned::Message(self)
+    fn into_owned(self: Box<Self>) -> any::Owned {
+        any::Owned::Message(self)
     }
 }
 
@@ -50,12 +50,12 @@ impl Info for ::misanthropic::prompt::Message<'static> {
 // Content
 
 impl Buffer for ::misanthropic::prompt::message::Content<'static> {
-    fn as_borrowed<'a>(&'a self) -> cow::Borrowed<'a> {
-        cow::Borrowed::Content(self)
+    fn as_borrowed<'a>(&'a self) -> any::Borrowed<'a> {
+        any::Borrowed::Content(self)
     }
 
-    fn into_owned(self: Box<Self>) -> cow::Owned {
-        cow::Owned::Content(self)
+    fn into_owned(self: Box<Self>) -> any::Owned {
+        any::Owned::Content(self)
     }
 }
 
@@ -72,12 +72,12 @@ impl Info for ::misanthropic::prompt::message::Content<'static> {
 // Image
 
 impl Buffer for ::misanthropic::prompt::message::Image<'static> {
-    fn as_borrowed<'a>(&'a self) -> cow::Borrowed<'a> {
-        cow::Borrowed::Image(self)
+    fn as_borrowed<'a>(&'a self) -> any::Borrowed<'a> {
+        any::Borrowed::Image(self)
     }
 
-    fn into_owned(self: Box<Self>) -> cow::Owned {
-        cow::Owned::Image(self)
+    fn into_owned(self: Box<Self>) -> any::Owned {
+        any::Owned::Image(self)
     }
 }
 
@@ -94,11 +94,11 @@ impl Info for ::misanthropic::prompt::message::Image<'static> {
 // Stream Event
 
 impl Buffer for ::misanthropic::stream::Event<'static> {
-    fn as_borrowed<'a>(&'a self) -> cow::Borrowed<'a> {
+    fn as_borrowed<'a>(&'a self) -> any::Borrowed<'a> {
         todo!()
     }
 
-    fn into_owned(self: Box<Self>) -> cow::Owned {
+    fn into_owned(self: Box<Self>) -> any::Owned {
         todo!()
     }
 
@@ -117,15 +117,22 @@ impl Info for ::misanthropic::stream::Event<'static> {
     }
 }
 
+// Errors
+
+impl Error for ::misanthropic::stream::Error {}
+impl Error for ::misanthropic::client::Error {}
+impl Error for ::misanthropic::prompt::message::ImageDecodeError {}
+impl Error for ::misanthropic::prompt::TurnOrderError {}
+
 // Stream Error
 
 impl Buffer for ::misanthropic::stream::Error {
-    fn as_borrowed<'a>(&'a self) -> cow::Borrowed<'a> {
-        cow::Borrowed::Error(self)
+    fn as_borrowed<'a>(&'a self) -> any::Borrowed<'a> {
+        any::Borrowed::Error(self)
     }
 
-    fn into_owned(self: Box<Self>) -> cow::Owned {
-        cow::Owned::Error(self)
+    fn into_owned(self: Box<Self>) -> any::Owned {
+        any::Owned::Error(self)
     }
 }
 
@@ -142,12 +149,12 @@ impl Info for ::misanthropic::stream::Error {
 // Client Error
 
 impl Buffer for ::misanthropic::client::Error {
-    fn as_borrowed<'a>(&'a self) -> cow::Borrowed<'a> {
-        cow::Borrowed::Error(self)
+    fn as_borrowed<'a>(&'a self) -> any::Borrowed<'a> {
+        any::Borrowed::Error(self)
     }
 
-    fn into_owned(self: Box<Self>) -> cow::Owned {
-        cow::Owned::Error(self)
+    fn into_owned(self: Box<Self>) -> any::Owned {
+        any::Owned::Error(self)
     }
 }
 
@@ -164,12 +171,12 @@ impl Info for ::misanthropic::client::Error {
 // Image Decode Error
 
 impl Buffer for ::misanthropic::prompt::message::ImageDecodeError {
-    fn as_borrowed<'a>(&'a self) -> cow::Borrowed<'a> {
-        cow::Borrowed::Error(self)
+    fn as_borrowed<'a>(&'a self) -> any::Borrowed<'a> {
+        any::Borrowed::Error(self)
     }
 
-    fn into_owned(self: Box<Self>) -> cow::Owned {
-        cow::Owned::Error(self)
+    fn into_owned(self: Box<Self>) -> any::Owned {
+        any::Owned::Error(self)
     }
 }
 
@@ -183,15 +190,37 @@ impl Info for ::misanthropic::prompt::message::ImageDecodeError {
     }
 }
 
+// Turn Order Error
+
+impl Buffer for ::misanthropic::prompt::TurnOrderError {
+    fn as_borrowed<'a>(&'a self) -> any::Borrowed<'a> {
+        any::Borrowed::Error(self)
+    }
+
+    fn into_owned(self: Box<Self>) -> any::Owned {
+        any::Owned::Error(self)
+    }
+}
+
+impl Info for ::misanthropic::prompt::TurnOrderError {
+    fn name(&self) -> Cow<'static, str> {
+        Cow::Borrowed(stringify!(TurnOrderError))
+    }
+
+    fn description(&self) -> Cow<'static, str> {
+        Cow::Owned(format!("Turn Order Error (misanthropic): {}", self))
+    }
+}
+
 // Tool Use
 
 impl Buffer for ::misanthropic::tool::Use<'static> {
-    fn as_borrowed<'a>(&'a self) -> cow::Borrowed<'a> {
-        cow::Borrowed::ToolCall(self)
+    fn as_borrowed<'a>(&'a self) -> any::Borrowed<'a> {
+        any::Borrowed::ToolCall(self)
     }
 
-    fn into_owned(self: Box<Self>) -> cow::Owned {
-        cow::Owned::ToolCall(self)
+    fn into_owned(self: Box<Self>) -> any::Owned {
+        any::Owned::ToolCall(self)
     }
 }
 
@@ -245,19 +274,19 @@ impl ToolError for ::misanthropic::tool::Result<'static> {
 }
 
 impl Buffer for ::misanthropic::tool::Result<'static> {
-    fn as_borrowed<'a>(&'a self) -> cow::Borrowed<'a> {
+    fn as_borrowed<'a>(&'a self) -> any::Borrowed<'a> {
         if self.is_error {
-            cow::Borrowed::Error(self as &dyn Error)
+            any::Borrowed::Error(self as &dyn Error)
         } else {
-            cow::Borrowed::ToolOk(self as &dyn ToolOk)
+            any::Borrowed::ToolOk(self as &dyn ToolOk)
         }
     }
 
-    fn into_owned(self: Box<Self>) -> cow::Owned {
+    fn into_owned(self: Box<Self>) -> any::Owned {
         if self.is_error {
-            cow::Owned::Error(self)
+            any::Owned::Error(self)
         } else {
-            cow::Owned::ToolOk(self)
+            any::Owned::ToolOk(self)
         }
     }
 }
@@ -272,7 +301,7 @@ impl Info for ::misanthropic::tool::Result<'static> {
     }
 }
 
-impl tool::Return for ::misanthropic::tool::Result<'static> {
+impl tool::Result for ::misanthropic::tool::Result<'static> {
     /// ID of the tool call.
     fn id(&self) -> &str {
         &self.tool_use_id
@@ -290,12 +319,6 @@ impl tool::Return for ::misanthropic::tool::Result<'static> {
 }
 
 impl ToolOk for ::misanthropic::tool::Result<'static> {}
-
-// Errors
-
-impl Error for ::misanthropic::stream::Error {}
-impl Error for ::misanthropic::client::Error {}
-impl Error for ::misanthropic::prompt::message::ImageDecodeError {}
 
 // Markdown Options
 
@@ -379,20 +402,23 @@ impl Prompt for ::misanthropic::Prompt<'static> {
     }
 
     fn add_message(
-        mut self: Box<Self>,
+        self: Box<Self>,
         message: Box<dyn Message>,
     ) -> Result<Box<dyn Prompt>, Box<dyn Error>> {
-        self.messages.push(message.into_native().into());
-        Ok(self)
+        Ok(Box::new(::misanthropic::prompt::Prompt::add_message(
+            *self,
+            message.into_concrete(),
+        )?))
     }
 
     fn extend_messages(
-        mut self: Box<Self>,
+        self: Box<Self>,
         messages: Box<dyn Iterator<Item = Box<dyn Message>>>,
     ) -> Result<Box<dyn Prompt>, Box<dyn Error>> {
-        self.messages
-            .extend(messages.map(|message| message.into_native().into()));
-        Ok(self)
+        Ok(Box::new(::misanthropic::prompt::Prompt::add_messages(
+            *self,
+            messages.map(|message| message.into_concrete()),
+        )?))
     }
 
     fn messages<'a>(
@@ -406,9 +432,9 @@ impl Prompt for ::misanthropic::Prompt<'static> {
 
 impl Into<::misanthropic::prompt::Message<'static>> for Box<dyn Message> {
     fn into(self) -> ::misanthropic::prompt::Message<'static> {
-        match self.into_native() {
-            message::NativeKind::MisanthropicPromptMessage(message) => message,
-            message::NativeKind::MisanthropicResponseMessage(message) => {
+        match self.into_concrete() {
+            message::Kind::MisanthropicPromptMessage(message) => message,
+            message::Kind::MisanthropicResponseMessage(message) => {
                 message.message
             }
         }
@@ -427,7 +453,7 @@ impl Message for ::misanthropic::prompt::Message<'static> {
                     // With Anthropic, the `User` role can contain a
                     // `ToolResult` block :/
                     if let Some(Block::ToolResult { .. }) = vec.first() {
-                        ToolReturn
+                        ToolResult
                     } else {
                         User
                     }
@@ -450,8 +476,8 @@ impl Message for ::misanthropic::prompt::Message<'static> {
         &self.content
     }
 
-    fn into_native(self: Box<Self>) -> crate::buffer::message::NativeKind {
-        crate::buffer::message::NativeKind::MisanthropicPromptMessage(*self)
+    fn into_concrete(self: Box<Self>) -> crate::buffer::message::Kind {
+        crate::buffer::message::Kind::MisanthropicPromptMessage(*self)
     }
 
     fn into_content(self) -> Box<dyn Content> {
@@ -459,11 +485,11 @@ impl Message for ::misanthropic::prompt::Message<'static> {
     }
 }
 
-impl Into<::misanthropic::prompt::Message<'static>> for message::NativeKind {
+impl Into<::misanthropic::prompt::Message<'static>> for message::Kind {
     fn into(self) -> ::misanthropic::prompt::Message<'static> {
         match self {
-            message::NativeKind::MisanthropicPromptMessage(message) => message,
-            message::NativeKind::MisanthropicResponseMessage(message) => {
+            message::Kind::MisanthropicPromptMessage(message) => message,
+            message::Kind::MisanthropicResponseMessage(message) => {
                 message.message
             }
         }

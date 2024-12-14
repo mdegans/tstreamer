@@ -1,6 +1,6 @@
 use crate::buffer::{
     tool::{ToolError, ToolOk},
-    Buffer, Image, Return, ToolCall,
+    Buffer, Image, Result, ToolCall,
 };
 
 /// [`Content`] of a [`Message`] as one or more [`Block`]s of a specific
